@@ -69,20 +69,32 @@ else
   CTX_ICON="🧊"
 fi
 
-# rate limit info
+# rate limit bars (remaining = 100 - used)
+make_bar() {
+  local pct=${1%%.*}
+  local filled=$((pct / 10))
+  local empty=$((10 - filled))
+  printf "%${filled}s" | tr ' ' '='
+  printf "%${empty}s" | tr ' ' '-'
+}
+
 RL_INFO=""
 if [ -n "$RL5_PCT" ] && [ "$RL5_PCT" != "null" ]; then
   RL5_INT=${RL5_PCT%%.*}
-  RL_INFO="5h: ${RL5_INT}%"
+  RL5_REM=$((100 - RL5_INT))
+  RL5_BAR=$(make_bar "$RL5_REM")
+  RL_INFO="5h: ${RL5_REM}% [${RL5_BAR}]"
 fi
 if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
   RL7_INT=${RL7_PCT%%.*}
-  RL_INFO="${RL_INFO} 7d: ${RL7_INT}%"
+  RL7_REM=$((100 - RL7_INT))
+  RL7_BAR=$(make_bar "$RL7_REM")
+  RL_INFO="${RL_INFO} 7d: ${RL7_REM}% [${RL7_BAR}]"
 fi
 
 # output
-LINE2="${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
-[ -n "$RL_INFO" ] && LINE2="${LINE2} │ ${RL_INFO}"
+LINE1="📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
+[ -n "$RL_INFO" ] && LINE1="${LINE1} │ ${RL_INFO}"
 
-echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
-echo "$LINE2"
+echo "$LINE1"
+echo "${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
