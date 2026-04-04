@@ -31,6 +31,11 @@ REM=${REM%%.*}
 PCT=$((100 - REM))
 VERSION=$(parse '.version' '')
 
+# rate limits
+RL5_PCT=$(parse '.rate_limits.five_hour.used_percentage' '')
+RL5_RESET=$(parse '.rate_limits.five_hour.resets_at' '')
+RL7_PCT=$(parse '.rate_limits.seven_day.used_percentage' '')
+
 # git branch + dirty check
 BRANCH=$(cd "$DIR" 2>/dev/null && git branch --show-current 2>/dev/null || echo "")
 if [ -n "$BRANCH" ] && cd "$DIR" 2>/dev/null && ! git diff --quiet HEAD 2>/dev/null; then
@@ -63,6 +68,47 @@ else
   CTX_ICON="🧊"
 fi
 
+# rate limit display
+RL_INFO=""
+if [ -n "$RL5_PCT" ] && [ "$RL5_PCT" != "null" ]; then
+  RL5_INT=${RL5_PCT%%.*}
+  # reset timer
+  RL5_TIMER=""
+  if [ -n "$RL5_RESET" ] && [ "$RL5_RESET" != "null" ]; then
+    NOW=$(date +%s)
+    DIFF=$((${RL5_RESET%%.*} - NOW))
+    if [ "$DIFF" -gt 0 ]; then
+      RL5_H=$((DIFF / 3600))
+      RL5_M=$(( (DIFF % 3600) / 60 ))
+      RL5_TIMER=" ${RL5_H}h${RL5_M}m"
+    fi
+  fi
+  # color indicator
+  if [ "$RL5_INT" -ge 80 ]; then
+    RL5_ICON="🔴"
+  elif [ "$RL5_INT" -ge 50 ]; then
+    RL5_ICON="🟡"
+  else
+    RL5_ICON="🟢"
+  fi
+  RL_INFO="${RL5_ICON} 5h: ${RL5_INT}%${RL5_TIMER}"
+fi
+
+if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
+  RL7_INT=${RL7_PCT%%.*}
+  if [ "$RL7_INT" -ge 80 ]; then
+    RL7_ICON="🔴"
+  elif [ "$RL7_INT" -ge 50 ]; then
+    RL7_ICON="🟡"
+  else
+    RL7_ICON="🟢"
+  fi
+  RL_INFO="${RL_INFO} ${RL7_ICON} 7d: ${RL7_INT}%"
+fi
+
 # output
+LINE2="${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
+[ -n "$RL_INFO" ] && LINE2="${LINE2} │${RL_INFO}"
+
 echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
-echo "${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
+echo "$LINE2"
