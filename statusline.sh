@@ -22,7 +22,9 @@ print(val)
   fi
 }
 
-MODEL=$(parse '.model.display_name' 'unknown')
+MODEL_RAW=$(parse '.model.display_name' 'unknown')
+# shorten model name: "Opus 4.6 (1M context)" → "Opus"
+MODEL=$(echo "$MODEL_RAW" | sed 's/ [0-9].*//')
 DIR=$(parse '.workspace.current_dir' '.')
 COST=$(parse '.cost.total_cost_usd' '0')
 DURATION_MS=$(parse '.cost.total_duration_ms' '0')
@@ -67,29 +69,20 @@ else
   CTX_ICON="🧊"
 fi
 
-# rate limit bars
-make_bar() {
-  local pct=${1%%.*}
-  local filled=$((pct / 10))
-  local empty=$((10 - filled))
-  printf "%${filled}s" | tr ' ' '='
-  printf "%${empty}s" | tr ' ' '-'
-}
-
-RL_LINE=""
+# rate limit info
+RL_INFO=""
 if [ -n "$RL5_PCT" ] && [ "$RL5_PCT" != "null" ]; then
   RL5_INT=${RL5_PCT%%.*}
-  RL5_BAR=$(make_bar "$RL5_INT")
-  RL_LINE="⏳ 5h: ${RL5_INT}% [${RL5_BAR}]"
+  RL_INFO="5h: ${RL5_INT}%"
 fi
-
 if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
   RL7_INT=${RL7_PCT%%.*}
-  RL7_BAR=$(make_bar "$RL7_INT")
-  RL_LINE="${RL_LINE}  7d: ${RL7_INT}% [${RL7_BAR}]"
+  RL_INFO="${RL_INFO} 7d: ${RL7_INT}%"
 fi
 
 # output
+LINE2="${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
+[ -n "$RL_INFO" ] && LINE2="${LINE2} │ ${RL_INFO}"
+
 echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
-echo "${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
-[ -n "$RL_LINE" ] && echo "$RL_LINE"
+echo "$LINE2"
