@@ -2,10 +2,7 @@
 
 A real-time status line for Claude Code — see what matters at a glance.
 
-```
-📁 my-project 🌿 main 🧠 Opus 4.6 (1M context) 📦 v2.1.92
-🧊 Context: 6% [=---------] 💰 $0.69 ($0.46/h)
-```
+![claude-status-bar screenshot](assets/screenshot.png)
 
 Context usage, cost, model, git branch, version — all in two lines, always visible.
 
