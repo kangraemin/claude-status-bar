@@ -33,7 +33,6 @@ VERSION=$(parse '.version' '')
 
 # rate limits
 RL5_PCT=$(parse '.rate_limits.five_hour.used_percentage' '')
-RL5_RESET=$(parse '.rate_limits.five_hour.resets_at' '')
 RL7_PCT=$(parse '.rate_limits.seven_day.used_percentage' '')
 
 # git branch + dirty check
@@ -77,33 +76,20 @@ make_bar() {
   printf "%${empty}s" | tr ' ' '-'
 }
 
-RL_INFO=""
+RL_LINE=""
 if [ -n "$RL5_PCT" ] && [ "$RL5_PCT" != "null" ]; then
   RL5_INT=${RL5_PCT%%.*}
   RL5_BAR=$(make_bar "$RL5_INT")
-  # reset timer
-  RL5_TIMER=""
-  if [ -n "$RL5_RESET" ] && [ "$RL5_RESET" != "null" ]; then
-    NOW=$(date +%s)
-    DIFF=$((${RL5_RESET%%.*} - NOW))
-    if [ "$DIFF" -gt 0 ]; then
-      RL5_H=$((DIFF / 3600))
-      RL5_M=$(( (DIFF % 3600) / 60 ))
-      RL5_TIMER=" ~${RL5_H}h${RL5_M}m"
-    fi
-  fi
-  RL_INFO="5h: ${RL5_INT}% [${RL5_BAR}]${RL5_TIMER}"
+  RL_LINE="⏳ 5h: ${RL5_INT}% [${RL5_BAR}]"
 fi
 
 if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
   RL7_INT=${RL7_PCT%%.*}
   RL7_BAR=$(make_bar "$RL7_INT")
-  RL_INFO="${RL_INFO} 7d: ${RL7_INT}% [${RL7_BAR}]"
+  RL_LINE="${RL_LINE}  7d: ${RL7_INT}% [${RL7_BAR}]"
 fi
 
 # output
-LINE2="${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
-[ -n "$RL_INFO" ] && LINE2="${LINE2} │ ${RL_INFO}"
-
 echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
-echo "$LINE2"
+echo "${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
+[ -n "$RL_LINE" ] && echo "$RL_LINE"
