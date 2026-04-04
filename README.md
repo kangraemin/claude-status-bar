@@ -1,5 +1,7 @@
 # claude-status-bar
 
+[한국어](README.ko.md)
+
 A real-time status line for Claude Code — see what matters at a glance.
 
 ![claude-status-bar screenshot](assets/screenshot.png)
