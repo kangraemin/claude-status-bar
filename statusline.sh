@@ -68,10 +68,19 @@ else
   CTX_ICON="🧊"
 fi
 
-# rate limit display
+# rate limit bars
+make_bar() {
+  local pct=${1%%.*}
+  local filled=$((pct / 10))
+  local empty=$((10 - filled))
+  printf "%${filled}s" | tr ' ' '='
+  printf "%${empty}s" | tr ' ' '-'
+}
+
 RL_INFO=""
 if [ -n "$RL5_PCT" ] && [ "$RL5_PCT" != "null" ]; then
   RL5_INT=${RL5_PCT%%.*}
+  RL5_BAR=$(make_bar "$RL5_INT")
   # reset timer
   RL5_TIMER=""
   if [ -n "$RL5_RESET" ] && [ "$RL5_RESET" != "null" ]; then
@@ -80,35 +89,21 @@ if [ -n "$RL5_PCT" ] && [ "$RL5_PCT" != "null" ]; then
     if [ "$DIFF" -gt 0 ]; then
       RL5_H=$((DIFF / 3600))
       RL5_M=$(( (DIFF % 3600) / 60 ))
-      RL5_TIMER=" ${RL5_H}h${RL5_M}m"
+      RL5_TIMER=" ~${RL5_H}h${RL5_M}m"
     fi
   fi
-  # color indicator
-  if [ "$RL5_INT" -ge 80 ]; then
-    RL5_ICON="🔴"
-  elif [ "$RL5_INT" -ge 50 ]; then
-    RL5_ICON="🟡"
-  else
-    RL5_ICON="🟢"
-  fi
-  RL_INFO="${RL5_ICON} 5h: ${RL5_INT}%${RL5_TIMER}"
+  RL_INFO="5h: ${RL5_INT}% [${RL5_BAR}]${RL5_TIMER}"
 fi
 
 if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
   RL7_INT=${RL7_PCT%%.*}
-  if [ "$RL7_INT" -ge 80 ]; then
-    RL7_ICON="🔴"
-  elif [ "$RL7_INT" -ge 50 ]; then
-    RL7_ICON="🟡"
-  else
-    RL7_ICON="🟢"
-  fi
-  RL_INFO="${RL_INFO} ${RL7_ICON} 7d: ${RL7_INT}%"
+  RL7_BAR=$(make_bar "$RL7_INT")
+  RL_INFO="${RL_INFO} 7d: ${RL7_INT}% [${RL7_BAR}]"
 fi
 
 # output
 LINE2="${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
-[ -n "$RL_INFO" ] && LINE2="${LINE2} │${RL_INFO}"
+[ -n "$RL_INFO" ] && LINE2="${LINE2} │ ${RL_INFO}"
 
 echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
 echo "$LINE2"
