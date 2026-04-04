@@ -93,8 +93,5 @@ if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
 fi
 
 # output
-LINE2="📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
-[ -n "$RL_INFO" ] && LINE2="${LINE2} │ ${RL_INFO}"
-
-echo "${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
-echo "$LINE2"
+LINE="${CTX_ICON} ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT}) │ 📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL"
+[ -n "$RL_INFO" ] && echo "${LINE} │ ${RL_INFO}" || echo "$LINE"
