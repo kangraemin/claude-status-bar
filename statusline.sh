@@ -31,8 +31,11 @@ REM=${REM%%.*}
 PCT=$((100 - REM))
 VERSION=$(parse '.version' '')
 
-# git branch
+# git branch + dirty check
 BRANCH=$(cd "$DIR" 2>/dev/null && git branch --show-current 2>/dev/null || echo "")
+if [ -n "$BRANCH" ] && cd "$DIR" 2>/dev/null && ! git diff --quiet HEAD 2>/dev/null; then
+  BRANCH="${BRANCH}*"
+fi
 
 # context bar (usage-based: fills up as you use more)
 FILLED=$((PCT / 10))
@@ -51,6 +54,15 @@ else
   HOURLY_FMT='$0.00/h'
 fi
 
+# context warning icon
+if [ "$PCT" -ge 80 ]; then
+  CTX_ICON="❗"
+elif [ "$PCT" -ge 70 ]; then
+  CTX_ICON="⚠️"
+else
+  CTX_ICON="🧊"
+fi
+
 # output
 echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL 📦 v$VERSION"
-echo "🧊 Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
+echo "${CTX_ICON} Context: ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"

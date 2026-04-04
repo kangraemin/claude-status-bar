@@ -254,6 +254,60 @@ else
   assert_fail "TC-09" "statusline.sh: JSON 파싱" "output: $OUTPUT"
 fi
 
+# ══════════════════════════════════════════════════
+# TC-10: 컨텍스트 경고 — <70% → 🧊
+# ══════════════════════════════════════════════════
+TEST_JSON_NORMAL='{
+  "model": {"display_name": "TestModel"},
+  "workspace": {"current_dir": "/tmp/test-project"},
+  "cost": {"total_cost_usd": 0, "total_duration_ms": 0},
+  "context_window": {"remaining_percentage": 50},
+  "version": "1.0.0"
+}'
+OUTPUT=$(echo "$TEST_JSON_NORMAL" | bash "$TARGET" 2>/dev/null)
+LINE2=$(echo "$OUTPUT" | tail -1)
+if echo "$LINE2" | grep -q "🧊"; then
+  assert_pass "TC-10" "컨텍스트 <70% → 🧊"
+else
+  assert_fail "TC-10" "컨텍스트 <70% → 🧊" "output: $LINE2"
+fi
+
+# ══════════════════════════════════════════════════
+# TC-11: 컨텍스트 경고 — 70~79% → ⚠️
+# ══════════════════════════════════════════════════
+TEST_JSON_WARN='{
+  "model": {"display_name": "TestModel"},
+  "workspace": {"current_dir": "/tmp/test-project"},
+  "cost": {"total_cost_usd": 0, "total_duration_ms": 0},
+  "context_window": {"remaining_percentage": 25},
+  "version": "1.0.0"
+}'
+OUTPUT=$(echo "$TEST_JSON_WARN" | bash "$TARGET" 2>/dev/null)
+LINE2=$(echo "$OUTPUT" | tail -1)
+if echo "$LINE2" | grep -q "⚠"; then
+  assert_pass "TC-11" "컨텍스트 70~79% → ⚠️"
+else
+  assert_fail "TC-11" "컨텍스트 70~79% → ⚠️" "output: $LINE2"
+fi
+
+# ══════════════════════════════════════════════════
+# TC-12: 컨텍스트 경고 — >=80% → ❗
+# ══════════════════════════════════════════════════
+TEST_JSON_CRIT='{
+  "model": {"display_name": "TestModel"},
+  "workspace": {"current_dir": "/tmp/test-project"},
+  "cost": {"total_cost_usd": 0, "total_duration_ms": 0},
+  "context_window": {"remaining_percentage": 15},
+  "version": "1.0.0"
+}'
+OUTPUT=$(echo "$TEST_JSON_CRIT" | bash "$TARGET" 2>/dev/null)
+LINE2=$(echo "$OUTPUT" | tail -1)
+if echo "$LINE2" | grep -q "❗"; then
+  assert_pass "TC-12" "컨텍스트 >=80% → ❗"
+else
+  assert_fail "TC-12" "컨텍스트 >=80% → ❗" "output: $LINE2"
+fi
+
 # ── 최종 정리 (restore는 trap이 처리) ──────────────
 
 echo ""
