@@ -93,5 +93,6 @@ if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
 fi
 
 # output
-echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL ${CTX_ICON} ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
+echo "📁 ${DIR##*/} 🌿 $BRANCH 🧠 $MODEL"
+echo "${CTX_ICON} ${PCT}% [${BAR}] 💰 ${COST_FMT} (${HOURLY_FMT})"
 [ -n "$RL_INFO" ] && echo "⏳ ${RL_INFO}"
