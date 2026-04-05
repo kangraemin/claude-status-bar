@@ -81,15 +81,13 @@ make_bar() {
 RL_INFO=""
 if [ -n "$RL5_PCT" ] && [ "$RL5_PCT" != "null" ]; then
   RL5_INT=${RL5_PCT%%.*}
-  RL5_REM=$((100 - RL5_INT))
-  RL5_BAR=$(make_bar "$RL5_REM")
-  RL_INFO="5h: ${RL5_REM}% [${RL5_BAR}]"
+  RL5_BAR=$(make_bar "$RL5_INT")
+  RL_INFO="5h: ${RL5_INT}% [${RL5_BAR}]"
 fi
 if [ -n "$RL7_PCT" ] && [ "$RL7_PCT" != "null" ]; then
   RL7_INT=${RL7_PCT%%.*}
-  RL7_REM=$((100 - RL7_INT))
-  RL7_BAR=$(make_bar "$RL7_REM")
-  RL_INFO="${RL_INFO} 7d: ${RL7_REM}% [${RL7_BAR}]"
+  RL7_BAR=$(make_bar "$RL7_INT")
+  RL_INFO="${RL_INFO} 7d: ${RL7_INT}% [${RL7_BAR}]"
 fi
 
 # output

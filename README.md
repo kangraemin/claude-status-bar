@@ -13,7 +13,7 @@
 
 ---
 
-Context usage, cost, model, git branch, version — two lines, always visible.
+Directory, git branch, model, context usage, cost, and rate limits — always visible at the bottom.
 
 ![claude-status-bar screenshot](assets/screenshot.png)
 
@@ -27,16 +27,14 @@ Restart Claude Code. That's it.
 
 ## What You See
 
-| | Info | Example |
-|---|------|---------|
-| 📁 | Directory | `my-project` |
-| 🌿 | Git branch | `main` |
-| 🧠 | Model | `Opus 4.6 (1M context)` |
-| 📦 | Version | `v2.1.92` |
-| 🧊 | Context used | `9% [=---------]` |
-| 💰 | Session cost | `$3.62 ($11.65/h)` |
+| Line | Info | Example |
+|------|------|---------|
+| 1 | Directory, branch, model | `📁 my-project 🌿 main 🧠 Opus` |
+| 2 | Context usage + session cost | `🧊 10% [=---------] 💰 $15.09 ($1.26/h)` |
+| 3 | Rate limit used (5h / 7d) | `⏳ 5h: 21% [==--------] 7d: 44% [====------]` |
 
-The context bar fills up as you use more — so you know when to `/compact` or start fresh.
+- Context bar fills up as you use more — know when to `/compact` or start fresh.
+- Rate limits show **used** quota, matching the built-in `/status` display. Appears only for Pro/Max subscribers.
 
 ## Update
 
@@ -68,7 +66,7 @@ The installer does two things:
 }
 ```
 
-Claude Code pipes session data as JSON to stdin. The script parses it with `jq` (preferred) or `python3` (fallback) and prints two lines.
+Claude Code pipes session data as JSON to stdin. The script parses it with `jq` (preferred) or `python3` (fallback) and outputs three lines.
 
 ## Requirements
 

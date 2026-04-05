@@ -244,7 +244,7 @@ LINE2=$(echo "$OUTPUT" | tail -1)
 OK=true
 echo "$LINE1" | grep -q "test-project" || OK=false
 echo "$LINE1" | grep -q "TestModel" || OK=false
-echo "$LINE1" | grep -q "v9.9.9" || OK=false
+# version is not displayed in statusline output
 echo "$LINE2" | grep -q "25%" || OK=false
 echo "$LINE2" | grep -q '\$1.23' || OK=false
 
